@@ -1,15 +1,29 @@
 import Vue from 'vue';
 import App from './App.vue';
-import vuetify from './plugins/vuetify';
 import store from './store';
+import Vuetify from 'vuetify/lib/framework';
+import localforage from 'localforage';
 
 Vue.config.productionTip = false;
+Vue.use(Vuetify);
 
-new Vue({
-    vuetify,
-    store,
-    render: function(h)
+localforage.getItem('theme').then(theme =>
+{
+    if(!theme)
     {
-        return h(App);
+        theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
-}).$mount('#app');
+    
+    new Vue({
+        vuetify: new Vuetify({
+            theme: {
+                dark: theme !== 'light'
+            }
+        }),
+        store,
+        render: function(h)
+        {
+            return h(App);
+        }
+    }).$mount('#app');
+});

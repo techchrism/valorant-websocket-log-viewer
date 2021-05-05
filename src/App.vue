@@ -35,6 +35,8 @@
                 <span class="mr-2">Latest Release</span>
                 <v-icon>mdi-open-in-new</v-icon>
             </v-btn>
+
+            <dark-button/>
         </v-app-bar>
 
         <v-main>
@@ -45,11 +47,13 @@
 
 <script>
 import HelloWorld from './components/HelloWorld';
+import DarkButton from '@/components/DarkButton';
 
 export default {
     name: 'App',
 
     components: {
+        DarkButton,
         HelloWorld
     },
 
