@@ -12,7 +12,7 @@
         </v-app-bar>
 
         <v-main>
-            <HelloWorld/>
+            <file-dropper/>
         </v-main>
     </v-app>
 </template>
@@ -20,15 +20,15 @@
 <script>
 import HelloWorld from './components/HelloWorld';
 import DarkButton from '@/components/DarkButton';
+import FileDropper from '@/components/FileDropper';
 
 export default {
     name: 'App',
-
     components: {
+        FileDropper,
         DarkButton,
         HelloWorld
     },
-
     data: () => ({
         //
     })
