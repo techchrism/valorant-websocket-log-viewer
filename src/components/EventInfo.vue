@@ -8,10 +8,10 @@
                 <pre>{{dataFormatted}}</pre>
             </v-card-text>
         </v-card>
-        <v-card v-if="privateData" class="mt-5">
+        <v-card v-if="event.private" class="mt-5">
             <v-card-title>Private Data</v-card-title>
             <v-card-text>
-                <pre>{{JSON.stringify(privateData, null, 4)}}</pre>
+                <pre>{{JSON.stringify(event.private, null, 4)}}</pre>
             </v-card-text>
         </v-card>
     </div>
@@ -31,21 +31,6 @@ export default {
         eventHelp()
         {
             return this.$store.state.helpData[this.event.name];
-        },
-        privateData()
-        {
-            // Stuff broke with optional chaining and I didn't feel like figuring it out
-            if(this.event.data &&
-                this.event.data.data &&
-                this.event.data.data.presences &&
-                this.event.data.data.presences[0].private)
-            {
-                return JSON.parse(atob(this.event.data.data.presences[0].private));
-            }
-            else
-            {
-                return null;
-            }
         }
     }
 };

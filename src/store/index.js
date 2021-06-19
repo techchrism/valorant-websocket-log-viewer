@@ -58,6 +58,18 @@ export default new Vuex.Store({
             {
                 let event = {};
                 [, event.name, event.data] = JSON.parse(l);
+                event.original = event.data;
+                if(event.data.data && Array.isArray(event.data.data.presences))
+                {
+                    event.data.data.presences = event.data.data.presences.map(presence =>
+                    {
+                        if(presence.private)
+                        {
+                            presence.private = JSON.parse(atob(presence.private));
+                        }
+                        return presence;
+                    });
+                }
                 return event;
             });
             
