@@ -29,8 +29,7 @@
                 <file-dropper/>
             </template>
             <template v-if="ready && selection != null">
-
-                <h4>Selected {{selection}}</h4>
+                <event-info :event="$store.state.events[selection]"/>
             </template>
         </v-main>
     </v-app>
@@ -40,10 +39,12 @@
 import DarkButton from '@/components/DarkButton';
 import FileDropper from '@/components/FileDropper';
 import EventsList from '@/components/EventsList';
+import EventInfo from '@/components/EventInfo';
 
 export default {
     name: 'App',
     components: {
+        EventInfo,
         EventsList,
         FileDropper,
         DarkButton
