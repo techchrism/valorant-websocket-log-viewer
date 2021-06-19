@@ -4,7 +4,7 @@
             <template v-slot:default="{item}">
                 <v-list-item>
                     <v-list-item-content>
-                        <v-list-item-title>{{item.uri}}</v-list-item-title>
+                        <v-list-item-title>{{item.name.replace('OnJsonApiEvent_', '')}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
             </template>

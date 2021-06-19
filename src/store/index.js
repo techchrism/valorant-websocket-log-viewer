@@ -7,6 +7,7 @@ export default new Vuex.Store({
     state: {
         lockData: null,
         sessionData: null,
+        helpData: null,
         events: []
     },
     mutations: {
@@ -17,6 +18,10 @@ export default new Vuex.Store({
         setSessionData(state, sessionData)
         {
             state.sessionData = sessionData;
+        },
+        setHelpData(state, helpData)
+        {
+            state.helpData = helpData;
         },
         setEvents(state, events)
         {
@@ -43,16 +48,22 @@ export default new Vuex.Store({
             }
             
             const lines = text.split('\n').filter(line => line.length > 0);
-            if(lines.length < 2)
+            if(lines.length < 3)
             {
                 throw 'Not enough lines in file';
             }
             
-            const [lockdata, session] = lines.splice(0, 2).map(l => JSON.parse(l));
-            const events = lines.map(l => JSON.parse(l)[2]);
+            const [lockdata, session, help] = lines.splice(0, 3).map(l => JSON.parse(l));
+            const events = lines.filter(l => l.length > 0).map(l =>
+            {
+                let event = {};
+                [, event.name, event.data] = JSON.parse(l);
+                return event;
+            });
             
             context.commit('setLockData', lockdata);
             context.commit('setSessionData', session);
+            context.commit('setHelpData', help);
             context.commit('setEvents', events);
         }
     },
