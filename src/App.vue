@@ -8,7 +8,7 @@
             ref="nav"
             app
         >
-            <events-list :height="navHeight"/>
+            <events-list :height="navHeight" @selectionChange="selectionChange"/>
         </v-navigation-drawer>
 
         <v-app-bar app color="primary" dark :clipped-left="$vuetify.breakpoint.lgAndUp">
@@ -28,8 +28,9 @@
                 <!-- TODO add explanation -->
                 <file-dropper/>
             </template>
-            <template v-else>
-                <h4>Info</h4>
+            <template v-if="ready && selection != null">
+
+                <h4>Selected {{selection}}</h4>
             </template>
         </v-main>
     </v-app>
@@ -55,7 +56,8 @@ export default {
     },
     data: () => ({
         drawer: null,
-        navHeight: 0
+        navHeight: 0,
+        selection: null
     }),
     mounted()
     {
@@ -70,6 +72,10 @@ export default {
         resizeEvent()
         {
             this.navHeight = window.innerHeight - 64;
+        },
+        selectionChange(newSelection)
+        {
+            this.selection = newSelection;
         }
     }
 };
