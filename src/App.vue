@@ -8,7 +8,15 @@
             ref="nav"
             app
         >
-            <events-list :height="navHeight" @selectionChange="selectionChange"/>
+            <div class="d-flex flex-column full-height">
+                <v-text-field dense
+                              label="Search"
+                              append-icon="mdi-magnify"
+                              class="ma-3 mt-7"
+                              v-model="search"
+                              clearable/>
+                <events-list :height="eventsHeight" :search="search" ref="eventsList" @selectionChange="selectionChange"/>
+            </div>
         </v-navigation-drawer>
 
         <v-app-bar app color="primary" dark :clipped-left="$vuetify.breakpoint.lgAndUp">
@@ -29,7 +37,7 @@
                 <file-dropper/>
             </template>
             <template v-if="ready && selection != null">
-                <event-info :event="$store.state.events[selection]"/>
+                <event-info :event="selection"/>
             </template>
         </v-main>
     </v-app>
@@ -57,26 +65,28 @@ export default {
     },
     data: () => ({
         drawer: null,
-        navHeight: 0,
-        selection: null
+        eventsHeight: 0,
+        selection: null,
+        eventsListResizeObserver: null,
+        search: ''
     }),
-    mounted()
+    updated()
     {
-        this.navHeight = window.innerHeight - 64;
-        window.addEventListener('resize', this.resizeEvent);
-    },
-    destroyed()
-    {
-        window.removeEventListener('resize', this.resizeEvent);
+        if(this.$refs.eventsList.$el && this.eventsListResizeObserver === null)
+        {
+            this.eventsHeight = this.$refs.eventsList.$el.clientHeight;
+
+            this.eventsListResizeObserver = new ResizeObserver(entries =>
+            {
+                this.eventsHeight = entries[0].contentRect.height;
+            });
+            this.eventsListResizeObserver.observe(this.$refs.eventsList.$el);
+        }
     },
     methods: {
-        resizeEvent()
+        selectionChange({index, selection})
         {
-            this.navHeight = window.innerHeight - 64;
-        },
-        selectionChange(newSelection)
-        {
-            this.selection = newSelection;
+            this.selection = selection;
         }
     }
 };
@@ -86,5 +96,10 @@ export default {
     html
     {
         overflow-y: auto !important;
+    }
+
+    .full-height
+    {
+        height: 100%;
     }
 </style>

@@ -105,6 +105,7 @@ export default new Vuex.Store({
                 {
                     event.data.data.payload = JSON.parse(event.data.data.payload);
                 }
+                event.text = JSON.stringify(event.data);
                 
                 return event;
             }).filter(e => e !== null);
