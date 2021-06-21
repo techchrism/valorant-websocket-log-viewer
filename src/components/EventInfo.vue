@@ -6,7 +6,11 @@
         <v-card class="mt-5">
             <v-card-title>Info</v-card-title>
             <v-card-text>
-                <strong>Time:</strong> {{event.time}} ({{timeFormatted}})
+                <strong>Received time:</strong> {{event.time}} ({{timeFormatted}})<br>
+                <template v-if="eventTimestamp">
+                    <strong>Time delta:</strong> {{event.time - eventTimestamp}}ms<br>
+                </template>
+
             </v-card-text>
         </v-card>
         <v-card class="mt-5" v-if="party">
@@ -53,13 +57,32 @@ export default {
         {
             return (new Date(this.event.time)).toString();
         },
-        party()
+        presence()
         {
             if(this.event.data.data && Array.isArray(this.event.data.data.presences) &&
-                this.event.data.data.presences.length === 1 && this.event.data.data.presences[0].private)
+                this.event.data.data.presences.length === 1)
             {
-                const partyId = this.event.data.data.presences[0].private.partyId;
-                return this.$store.state.parties.find(party => party.id === partyId);
+                return this.event.data.data.presences[0];
+            }
+            return null;
+        },
+        eventTimestamp()
+        {
+            if(this.presence)
+            {
+                return this.presence.time;
+            }
+            else if(this.event.data.data && this.event.data.data.timestamp)
+            {
+                return this.event.data.data.timestamp;
+            }
+            return null;
+        },
+        party()
+        {
+            if(this.presence && this.presence.private)
+            {
+                return this.$store.state.parties.find(party => party.id === this.presence.private.partyId);
             }
             return null;
         }
