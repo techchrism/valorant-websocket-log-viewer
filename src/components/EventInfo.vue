@@ -2,7 +2,14 @@
     <div class="ma-5">
         <h1>{{event.name}}</h1>
         <h3 v-if="eventHelp">{{eventHelp}}</h3>
-        <v-card>
+        <v-divider class="ma-5"/>
+        <v-card class="mt-5">
+            <v-card-title>Info</v-card-title>
+            <v-card-text>
+                <strong>Time:</strong> {{event.time}} ({{timeFormatted}})
+            </v-card-text>
+        </v-card>
+        <v-card class="mt-5">
             <v-card-title>JSON Data</v-card-title>
             <v-card-text>
                 <pre>{{dataFormatted}}</pre>
@@ -31,6 +38,10 @@ export default {
         eventHelp()
         {
             return this.$store.state.helpData[this.event.name];
+        },
+        timeFormatted()
+        {
+            return (new Date(this.event.time)).toString();
         }
     }
 };
