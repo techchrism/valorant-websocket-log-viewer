@@ -12,7 +12,7 @@
                 <v-text-field dense
                               label="Search"
                               append-icon="mdi-magnify"
-                              class="ma-3 mt-7"
+                              class="mx-3 mt-7"
                               v-model="search"
                               clearable/>
                 <events-list :height="eventsHeight" :search="search" ref="eventsList" @selectionChange="selectionChange"/>
@@ -33,7 +33,10 @@
 
         <v-main>
             <template v-if="!ready">
-                <!-- TODO add explanation -->
+                <p class="text-center mt-8">
+                    A webapp designed to ease looking through Valorant WebSocket events.<br>
+                    Log files can be generated from <a href="https://github.com/techchrism/valorant-websocket-logger">https://github.com/techchrism/valorant-websocket-logger</a>
+                </p>
                 <file-dropper/>
             </template>
             <template v-if="ready && selection != null">

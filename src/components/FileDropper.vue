@@ -9,7 +9,7 @@
 
                 <div class="text-center padding no-click upload-msg">
                     <template v-if="!loading">
-                        <h3>Drag or Click to Upload Websocket Log</h3>
+                        <h3>Drag or Click to Upload WebSocket Log</h3>
                     </template>
 
                     <template v-if="loading">
