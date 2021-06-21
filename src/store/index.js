@@ -53,12 +53,17 @@ export default new Vuex.Store({
                 throw 'Not enough lines in file';
             }
             
+            const timestampRegex = /(\d+) (.*)/;
             const [lockdata, session, help] = lines.splice(0, 3).map(l => JSON.parse(l));
             const events = lines.filter(l => l.length > 0).map(l =>
             {
+                const [,timestr, text] = timestampRegex.exec(l);
+                if(text.length === 0) return null;
+                
                 let event = {};
-                [, event.name, event.data] = JSON.parse(l);
+                [, event.name, event.data] = JSON.parse(text);
                 event.original = event.data;
+                event.time = Number(timestr);
                 if(event.data.data && Array.isArray(event.data.data.presences))
                 {
                     event.data.data.presences = event.data.data.presences.map(presence =>
@@ -71,7 +76,7 @@ export default new Vuex.Store({
                     });
                 }
                 return event;
-            });
+            }).filter(e => e !== null);
             
             context.commit('setLockData', lockdata);
             context.commit('setSessionData', session);
