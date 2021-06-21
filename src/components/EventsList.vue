@@ -1,14 +1,10 @@
 <template>
-    <div>
+    <div class="full-height">
         <v-list class="no-padding">
-            <v-virtual-scroll :items="$store.state.events" :item-height="50" :height="height">
+            <v-virtual-scroll :items="$store.state.events" :item-height="62" :height="height">
                 <template v-slot="{item, index}">
                     <v-list-item-group v-model="model" v-on:change="selectionChange">
-                        <v-list-item :key="index" :value="index">
-                            <v-list-item-content>
-                                <v-list-item-title>{{item.name.replace('OnJsonApiEvent_', '')}}</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
+                        <event-list-element :index="index" :event="item"/>
                     </v-list-item-group>
                 </template>
             </v-virtual-scroll>
@@ -17,8 +13,10 @@
 </template>
 
 <script>
+import EventListElement from '@/components/EventListElement';
 export default {
     name: 'EventsList',
+    components: {EventListElement},
     props: {
         height: Number
     },
@@ -38,5 +36,10 @@ export default {
     .no-padding
     {
         padding: 0
+    }
+
+    .full-height
+    {
+        height: 100%;
     }
 </style>
