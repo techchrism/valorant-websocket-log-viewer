@@ -1,4 +1,4 @@
-# [https://techchrism.github.io/valorant-websocket-log-viewer/](Valorant WebSocket Log Viewer)
+# [Valorant WebSocket Log Viewer](https://techchrism.github.io/valorant-websocket-log-viewer/)
 Webapp designed to ease looking through Valorant WebSocket events.  
 Log files can be generated from [https://github.com/techchrism/valorant-websocket-logger](https://github.com/techchrism/valorant-websocket-logger)
 
