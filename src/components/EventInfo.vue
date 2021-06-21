@@ -9,6 +9,16 @@
                 <strong>Time:</strong> {{event.time}} ({{timeFormatted}})
             </v-card-text>
         </v-card>
+        <v-card class="mt-5" v-if="party">
+            <v-card-title>Party</v-card-title>
+            <v-card-text>
+                <strong>ID:</strong> {{party.id}}<br>
+                <strong>Members:</strong><br>
+                <ul>
+                    <li v-for="player of party.players" :key="player">{{player}}</li>
+                </ul>
+            </v-card-text>
+        </v-card>
         <v-card class="mt-5">
             <v-card-title>JSON Data</v-card-title>
             <v-card-text>
@@ -42,6 +52,16 @@ export default {
         timeFormatted()
         {
             return (new Date(this.event.time)).toString();
+        },
+        party()
+        {
+            if(this.event.data.data && Array.isArray(this.event.data.data.presences) &&
+                this.event.data.data.presences.length === 1 && this.event.data.data.presences[0].private)
+            {
+                const partyId = this.event.data.data.presences[0].private.partyId;
+                return this.$store.state.parties.find(party => party.id === partyId);
+            }
+            return null;
         }
     }
 };
