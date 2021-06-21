@@ -12,6 +12,9 @@
                 <span v-if="presenceData.mode">, {{presenceData.mode}}</span>
                 <span v-if="presenceData.map">, {{presenceData.allyScore}} - {{presenceData.enemyScore}}</span>
             </v-list-item-subtitle>
+            <v-list-item-subtitle v-if="chatData">
+                {{chatData.name}}: {{chatData.body}}
+            </v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
             <span class="text--secondary">{{hoursmins}}</span>
@@ -32,6 +35,18 @@ export default {
             const dt = new Date(this.event.time);
             return (dt.getHours() < 10 ? '0' : '') + dt.getHours() + ':' +
                 (dt.getMinutes() < 10 ? '0' : '') + dt.getMinutes();
+        },
+        chatData()
+        {
+            if(this.event.data.data && Array.isArray(this.event.data.data.messages) && this.event.data.data.messages.length === 1)
+            {
+                const message = this.event.data.data.messages[0];
+                return {
+                    body: message.body,
+                    name: message['game_name']
+                };
+            }
+            return null;
         },
         presenceData()
         {
