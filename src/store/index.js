@@ -8,6 +8,7 @@ export default new Vuex.Store({
         lockData: null,
         sessionData: null,
         helpData: null,
+        parties: null,
         events: []
     },
     mutations: {
@@ -26,6 +27,10 @@ export default new Vuex.Store({
         setEvents(state, events)
         {
             state.events = events;
+        },
+        setParties(state, parties)
+        {
+            state.parties = parties;
         },
         clearData(state)
         {
@@ -55,6 +60,9 @@ export default new Vuex.Store({
             
             const timestampRegex = /(\d+) (.*)/;
             const [lockdata, session, help] = lines.splice(0, 3).map(l => JSON.parse(l));
+            
+            let parties = [];
+            
             const events = lines.filter(l => l.length > 0).map(l =>
             {
                 const [,timestr, text] = timestampRegex.exec(l);
@@ -71,6 +79,23 @@ export default new Vuex.Store({
                         if(presence.private)
                         {
                             presence.private = JSON.parse(atob(presence.private));
+                            
+                            const existingParty = parties.find(party => party.id === presence.private.partyId);
+                            const playerName = presence['game_name'] + '#' + presence['game_tag'];
+                            if(existingParty)
+                            {
+                                if(!existingParty.players.includes(playerName))
+                                {
+                                    existingParty.players.push(playerName);
+                                }
+                            }
+                            else
+                            {
+                                parties.push({
+                                    id: presence.private.partyId,
+                                    players: [playerName]
+                                });
+                            }
                         }
                         return presence;
                     });
@@ -81,6 +106,7 @@ export default new Vuex.Store({
             context.commit('setLockData', lockdata);
             context.commit('setSessionData', session);
             context.commit('setHelpData', help);
+            context.commit('setParties', parties);
             context.commit('setEvents', events);
         }
     },
