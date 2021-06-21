@@ -100,6 +100,12 @@ export default new Vuex.Store({
                         return presence;
                     });
                 }
+                
+                if(event.data.data && typeof event.data.data.payload === 'string' && event.data.data.payload.startsWith('{'))
+                {
+                    event.data.data.payload = JSON.parse(event.data.data.payload);
+                }
+                
                 return event;
             }).filter(e => e !== null);
             
