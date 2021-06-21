@@ -1,4 +1,6 @@
-# valorant-websocket-log-viewer
+# Valorant WebSocket Log Viewer
+Webapp designed to ease looking through Valorant WebSocket events.  
+Log files can be generated from [https://github.com/techchrism/valorant-websocket-logger](https://github.com/techchrism/valorant-websocket-logger)
 
 ## Project setup
 ```
@@ -14,6 +16,3 @@ npm run serve
 ```
 npm run build
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
