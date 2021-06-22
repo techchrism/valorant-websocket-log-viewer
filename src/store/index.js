@@ -78,7 +78,7 @@ export default new Vuex.Store({
                     {
                         if(presence.private)
                         {
-                            presence.private = JSON.parse(atob(presence.private));
+                            presence.private = JSON.parse(presence.private.startsWith('{') ? presence.private : atob(presence.private));
                             
                             const existingParty = parties.find(party => party.id === presence.private.partyId);
                             const playerName = presence['game_name'] + '#' + presence['game_tag'];
