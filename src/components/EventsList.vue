@@ -29,7 +29,7 @@ export default {
         {
             if(this.search)
             {
-                return this.$store.state.events.filter(event => event.text.includes(this.search));
+                return this.$store.state.events.filter(event => event.name.includes(this.search) || event.text.includes(this.search));
             }
             return this.$store.state.events;
         }
