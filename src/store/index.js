@@ -3,9 +3,11 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-function processEventText(eventText) {
-    let event = {};
-    [, event.name, event.data] = JSON.parse(eventText);
+function processEvent(eventName, eventData) {
+    let event = {
+        name: eventName,
+        data: eventData
+    };
     event.original = event.data;
     if(event.data.data && Array.isArray(event.data.data.presences))
     {
@@ -107,29 +109,44 @@ export default new Vuex.Store({
                 throw 'Could not read text file';
             }
 
-            const lines = text.split('\n').filter(line => line.length > 0);
-            if(lines.length < 3)
+            if(text.startsWith('['))
             {
-                throw 'Not enough lines in file';
+                const eventsJson = JSON.parse(text);
+                const processedEvents = eventsJson.map(event => processEvent(event.event, event.data));
+
+                context.commit('setLockData', {});
+                context.commit('setSessionData', {});
+                context.commit('setHelpData', {});
+                context.commit('setParties', extractParties(processedEvents));
+                context.commit('setEvents', processedEvents);
             }
-
-            const timestampRegex = /(\d+) (.*)/;
-            const [lockdata, session, help] = lines.splice(0, 3).map(l => JSON.parse(l));
-
-            const events = lines.filter(l => l.length > 0).map(l =>
+            else
             {
-                const [,timestr, text] = timestampRegex.exec(l);
-                if(text.length === 0) return null;
-                const event = processEventText(text);
-                event.time = Number(timestr);
-                return event;
-            }).filter(e => e !== null);
+                const lines = text.split('\n').filter(line => line.length > 0);
+                if(lines.length < 3)
+                {
+                    throw 'Not enough lines in file';
+                }
 
-            context.commit('setLockData', lockdata);
-            context.commit('setSessionData', session);
-            context.commit('setHelpData', help);
-            context.commit('setParties', extractParties(events));
-            context.commit('setEvents', events);
+                const timestampRegex = /(\d+) (.*)/;
+                const [lockdata, session, help] = lines.splice(0, 3).map(l => JSON.parse(l));
+
+                const events = lines.filter(l => l.length > 0).map(l =>
+                {
+                    const [,timestr, text] = timestampRegex.exec(l);
+                    if(text.length === 0) return null;
+                    const [, eventName, eventData] = JSON.parse(text);
+                    const event = processEvent(eventName, eventData);
+                    event.time = Number(timestr);
+                    return event;
+                }).filter(e => e !== null);
+
+                context.commit('setLockData', lockdata);
+                context.commit('setSessionData', session);
+                context.commit('setHelpData', help);
+                context.commit('setParties', extractParties(events));
+                context.commit('setEvents', events);
+            }
         }
     },
     modules: {}

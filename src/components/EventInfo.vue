@@ -3,7 +3,7 @@
         <h1>{{event.name}}</h1>
         <h3 v-if="eventHelp">{{eventHelp}}</h3>
         <v-divider class="ma-5"/>
-        <v-card class="mt-5">
+        <v-card class="mt-5" v-if="event.time">
             <v-card-title>Info</v-card-title>
             <v-card-text>
                 <strong>Received time:</strong> {{event.time}} ({{timeFormatted}})<br>

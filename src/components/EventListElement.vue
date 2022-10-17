@@ -32,7 +32,12 @@ export default {
     computed: {
         hoursmins()
         {
-            const dt = new Date(this.event.time);
+            const inputDate = this.event.time || (this.presence?.time || this.event.data.data.timestamp);
+            if(!inputDate)
+            {
+                return '?';
+            }
+            const dt = new Date(inputDate);
             return (dt.getHours() < 10 ? '0' : '') + dt.getHours() + ':' +
                 (dt.getMinutes() < 10 ? '0' : '') + dt.getMinutes();
         },
@@ -48,22 +53,28 @@ export default {
             }
             return null;
         },
-        presenceData()
+        presence()
         {
             if(this.event.data.data && Array.isArray(this.event.data.data.presences) &&
                 this.event.data.data.presences.length === 1 && this.event.data.data.presences[0].private)
             {
-                const presence = this.event.data.data.presences[0];
-
-                const partyId = presence.private.partyId;
-                const playerName = presence['game_name'];
+                return this.event.data.data.presences[0];
+            }
+            return null;
+        },
+        presenceData()
+        {
+            if(this.presence)
+            {
+                const partyId = this.presence.private.partyId;
+                const playerName = this.presence['game_name'];
                 const party = this.$store.state.parties.find(party => party.id === partyId);
 
                 const status = {
                     'INGAME': 'in game',
                     'MENUS': 'in menus',
                     'PREGAME': 'pre-game'
-                }[presence.private['sessionLoopState']];
+                }[this.presence.private['sessionLoopState']];
                 const map = {
                     '/Game/Maps/Ascent/Ascent': 'Ascent',
                     '/Game/Maps/Bonsai/Bonsai': 'Split',
@@ -72,16 +83,16 @@ export default {
                     '/Game/Maps/Port/Port': 'Icebox',
                     '/Game/Maps/Poveglia/Range': 'The Range',
                     '/Game/Maps/Triad/Triad': 'Haven'
-                }[presence.private['matchMap']];
+                }[this.presence.private['matchMap']];
 
                 return {
                     playerName,
                     party,
                     status,
                     map,
-                    mode: presence.private['queueId'],
-                    allyScore: presence.private['partyOwnerMatchScoreAllyTeam'],
-                    enemyScore: presence.private['partyOwnerMatchScoreEnemyTeam']
+                    mode: this.presence.private['queueId'],
+                    allyScore: this.presence.private['partyOwnerMatchScoreAllyTeam'],
+                    enemyScore: this.presence.private['partyOwnerMatchScoreEnemyTeam']
                 }
             }
             return null;
