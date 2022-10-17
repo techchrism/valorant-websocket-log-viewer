@@ -60,6 +60,7 @@ export default {
             catch(e)
             {
                 this.error = e.toString();
+                console.error(e);
             }
             this.loading = false;
         }

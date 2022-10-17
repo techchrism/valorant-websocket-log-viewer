@@ -3,6 +3,61 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
+function processEventText(eventText) {
+    let event = {};
+    [, event.name, event.data] = JSON.parse(eventText);
+    event.original = event.data;
+    if(event.data.data && Array.isArray(event.data.data.presences))
+    {
+        event.data.data.presences = event.data.data.presences.map(presence =>
+        {
+            if(presence.private)
+            {
+                presence.private = JSON.parse(presence.private.startsWith('{') ? presence.private : atob(presence.private));
+            }
+            return presence;
+        });
+    }
+
+    if(event.data.data && typeof event.data.data.payload === 'string' && event.data.data.payload.startsWith('{'))
+    {
+        event.data.data.payload = JSON.parse(event.data.data.payload);
+    }
+    event.text = JSON.stringify(event.data);
+
+    return event;
+}
+
+function extractParties(events)
+{
+    const parties = [];
+    for(const event of events)
+    {
+        if(!Array.isArray(event.data?.data?.presences)) continue;
+        for(const presence of event.data.data.presences)
+        {
+            if(!presence.private) continue;
+            const existingParty = parties.find(party => party.id === presence.private.partyId);
+            const playerName = presence['game_name'] + '#' + presence['game_tag'];
+            if(existingParty)
+            {
+                if(!existingParty.players.includes(playerName))
+                {
+                    existingParty.players.push(playerName);
+                }
+            }
+            else
+            {
+                parties.push({
+                    id: presence.private.partyId,
+                    players: [playerName]
+                });
+            }
+        }
+    }
+    return parties;
+}
+
 export default new Vuex.Store({
     state: {
         lockData: null,
@@ -51,69 +106,29 @@ export default new Vuex.Store({
             {
                 throw 'Could not read text file';
             }
-            
+
             const lines = text.split('\n').filter(line => line.length > 0);
             if(lines.length < 3)
             {
                 throw 'Not enough lines in file';
             }
-            
+
             const timestampRegex = /(\d+) (.*)/;
             const [lockdata, session, help] = lines.splice(0, 3).map(l => JSON.parse(l));
-            
-            let parties = [];
-            
+
             const events = lines.filter(l => l.length > 0).map(l =>
             {
                 const [,timestr, text] = timestampRegex.exec(l);
                 if(text.length === 0) return null;
-                
-                let event = {};
-                [, event.name, event.data] = JSON.parse(text);
-                event.original = event.data;
+                const event = processEventText(text);
                 event.time = Number(timestr);
-                if(event.data.data && Array.isArray(event.data.data.presences))
-                {
-                    event.data.data.presences = event.data.data.presences.map(presence =>
-                    {
-                        if(presence.private)
-                        {
-                            presence.private = JSON.parse(presence.private.startsWith('{') ? presence.private : atob(presence.private));
-                            
-                            const existingParty = parties.find(party => party.id === presence.private.partyId);
-                            const playerName = presence['game_name'] + '#' + presence['game_tag'];
-                            if(existingParty)
-                            {
-                                if(!existingParty.players.includes(playerName))
-                                {
-                                    existingParty.players.push(playerName);
-                                }
-                            }
-                            else
-                            {
-                                parties.push({
-                                    id: presence.private.partyId,
-                                    players: [playerName]
-                                });
-                            }
-                        }
-                        return presence;
-                    });
-                }
-                
-                if(event.data.data && typeof event.data.data.payload === 'string' && event.data.data.payload.startsWith('{'))
-                {
-                    event.data.data.payload = JSON.parse(event.data.data.payload);
-                }
-                event.text = JSON.stringify(event.data);
-                
                 return event;
             }).filter(e => e !== null);
-            
+
             context.commit('setLockData', lockdata);
             context.commit('setSessionData', session);
             context.commit('setHelpData', help);
-            context.commit('setParties', parties);
+            context.commit('setParties', extractParties(events));
             context.commit('setEvents', events);
         }
     },
